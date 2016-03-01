@@ -1,5 +1,6 @@
 # CDS
-please add it's full form :P .
+----------
+
 ## AIM
 * To develop a program to copy large files to all computers in a network in a distributed manner.
 
