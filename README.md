@@ -6,3 +6,4 @@
 
 ## Strategies
 * One strategy would be to use one pc as a server initially and copy the file to another one and then use both as servers to copy to another two pcs and so on.
+* Another would be to broadcast the entire transfer so that each station can listen.
