@@ -5,25 +5,38 @@ import socket
 import argparse
 import signal
 import time
+import select
 from sendfile import sendfile
 
 def handler(signum, frame):
     print "Exiting"
-    exit()
+    os._exit(1)
 
 def get_client(nw_prefix, scanport):
-    hostid = 33
+    hostid = 1 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
             print "Scanning " + nw_prefix + str(hostid) + " on port " + str(scanport)
             sock.connect((nw_prefix + str(hostid), scanport))
+           
         except:
             time.sleep(2)
             hostid += 1
             hostid %= 255
             continue
-        break
+
+        t = select.select([sock], [], [], 2.0)
+        if(t[0] == []):
+            hostid += 1
+            hostid %= 255
+            del sock
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            continue
+        else:
+            l = sock.recv(1)
+            #print l
+            break
     return (sock, hostid)
     
 def start_server(scanport, filename, nw_prefix):
@@ -51,6 +64,8 @@ def recv_file(filepath, port):
         s.close()
         exit()
     print "Got connection from " + addr[0]
+    acc.send("1")
+
     s.close()
     l = acc.recv(1024)
     f = open(filepath, "w")
@@ -76,7 +91,7 @@ def send_file(sock, filepath):
             break
         offset += sent
     f.close()
-    sock.shutdown(socket.SHUT_WR)
+    sock.shutdown(socket.SHUT_RDWR)
     sock.close()
 
 
